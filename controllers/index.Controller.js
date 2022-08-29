@@ -41,12 +41,13 @@ module.exports = {
             'SELECT * FROM `usuarios` ',
             function (err, results) {
                 console.log(results);
-                if (results.length > 0) {                   //results es la tabla con los resultados
+                /*if (results.length > 0) {                   //results es la tabla con los resultados
                     res.json(respuesta(200, results))       //devuelvo results con un estado 200
                 }
                 else {
                     res.json(respuesta(404, []))            //deberia informar que no se encontro nada
-                }
+                }*/
+                res.json(respuesta(200, results))       //devuelvo results con un estado 200
             }
         );
         /*}
