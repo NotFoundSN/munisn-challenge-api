@@ -9,8 +9,8 @@ const controller = require('../controllers/index.Controller');
   view
 */
 router.post('/register', controller.register);
-router.get('/login', controller.login);
-router.get('/view', controller.view);
+router.post('/login', controller.login);
+router.post('/view', controller.view);
 /*router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });*/
