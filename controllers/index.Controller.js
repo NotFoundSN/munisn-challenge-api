@@ -1,10 +1,6 @@
-const mysql = require('mysql2');
 const token = require('../jwt/config');
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    database: 'municipalidad'
-});
+const sql = require('../sql/config');
+
 function respuesta(estado, dato) {
     return ({
         status: estado,
@@ -12,80 +8,54 @@ function respuesta(estado, dato) {
     })
 };
 
-/*connection.query(
-    'SELECT * FROM `table` WHERE `name` = "Page" AND `age` > 45',
-    function (err, results, fields) {
-        console.log(results); // results contains rows returned by server
-        console.log(fields); // fields contains extra meta data about results, if available
-    }
-);*/
-module.exports = {
-    login: (req, res, next) => {
-        console.log(req.body.username);
-        connection.query(
-            `SELECT * FROM administradores WHERE usuario = '${req.body.username}'`,
-            function (err, results) {
-                if (results.length == 0)                                                        //Valido que encontro el usuario
-                {
-                    res.json(respuesta(404, 'usuario o contraseña invalido'));
-                }
-                else {
-                    if (results[0].pass == req.body.password)                                   //Valida que la pw coincida
-                    {
-                        let data = token.createToken(results[0]);
-                        res.json(respuesta(200, { token: data, name: results[0].nombre }))       //devuelvo el token generado y el nombre del usuario
-                    }
-                    else {
-                        res.json(respuesta(404, 'usuario o contraseña invalido'));
-                    }
-                }
 
-            }
-        );
-    },
-    view: (req, res, next) => {
-        /*if (admin)                //chequeo de si es admin
-        {*/
-        connection.query(
-            'SELECT * FROM `usuarios` ',
-            function (err, results) {
-                console.log(results);
-                /*if (results.length > 0) {                   //results es la tabla con los resultados
-                    res.json(respuesta(200, results))       //devuelvo results con un estado 200
-                }
-                else {
-                    res.json(respuesta(404, []))            //deberia informar que no se encontro nada
-                }*/
-                res.json(respuesta(200, results))       //devuelvo results con un estado 200
-            }
-        );
-        /*}
-        else
+module.exports = {
+    login: async (req, res, next) => {
+        let admin = await sql.admin.search(req.body.username);                              //busco el admin
+        if (admin == false)                                                                 //verifico que exista en la tabla
         {
-            res.json(respuesta(200, 'Login necesario'))     //deberia informar que no esta logueado
-        }*/
+            res.json(respuesta(404, 'usuario o contraseña invalido'));                      //error de usuario
+        }
+        else {
+            if (admin.pass == req.body.password)                                            //Valida que la pw coincida
+            {
+                let data = token.createToken(admin);
+                res.json(respuesta(200, { token: data, name: admin.nombre }))               //devuelvo el token generado y el nombre del usuario
+            }
+            else {
+                res.json(respuesta(404, 'usuario o contraseña invalido'));                  //error de password
+            }
+        }
     },
-    register: (req, res, next) => {
-        connection.query(
-            `SELECT * FROM usuarios WHERE DNI = '${req.body.dni}'`,
-            function (err, results) {
-                if (results.length == 0) {
-                    let sql = `INSERT INTO usuarios (DNI, Nombre, Apellido, Telefono, email, direccion) VALUES (${req.body.dni}, '${req.body.name}', '${req.body.surname}', '${req.body.phone}', '${req.body.mail}', '${req.body.direction}')`; //codigo para insertar un nuevo registro SQL
-                    connection.query(sql);
-                    connection.query(
-                        `SELECT * FROM usuarios WHERE DNI = '${req.body.dni}'`,
-                        function (err, results) {
-                            if (results.length == 1) {
-                                res.json(respuesta(200, results))       //200 + algunos datos
-                            }
-                            else {
-                                res.json(respuesta(200, results))       //error, vuelva a intentar
-                            }
-                        });
-                }
-                else {
-                    res.json(respuesta(404, results[0]))       //error, ya esta cargado
-                }
-            });
+    view: async (req, res, next) => {
+        errors = req.errors;                                                //traigo los errores
+        console.log(errors);
+        if (errors.length == 0)                                             //reviso si hay errores
+        {
+            let consulta = await sql.usuario.viewAll();                     //busco todos los registros
+            res.json(respuesta(200, consulta))                              //devuelvo la lista de registros
+        }
+        else {
+            res.json(respuesta(404, []))                                    //devuelvo error con la lista vacia **borrar token del cliente
+        }
     },
+    register: async (req, res, next) => {
+        let consulta1 = await sql.usuario.search(req.body.DNI);                                         //busco si dni en la tabla
+        if (consulta1 == false)                                                                         //evaluo si existe el registro
+        {
+            sql.usuario.new(req.body);                                                                  //regenero el registro en la base de datos
+            let consulta2 = await sql.usuario.search(req.body.DNI);                                     //busco si se agrego correctamente
+            if (consulta2 == false)                                                                     //evaluo si se encontro el registro
+            {
+                res.json(respuesta(404, 'error al crear el registro, vuelva a intentar'));              //devuelvo erro al crear registro
+            }
+            else {
+                res.json(respuesta(200, { ...consulta2 }));                                             //devuelvo el registro entero, registro exitoso
+            }
+        }
+        else 
+        {
+            res.json(respuesta(404, { nombre: consulta1.nombre }));                                     //error, registro previo encontrado, devuelvo el nombre
+        }
+},
 }
