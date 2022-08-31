@@ -1,5 +1,6 @@
 const token = require('../jwt/config');
 const sql = require('../sql/config');
+const { validationResult } = require("express-validator");
 
 function respuesta(estado, dato) {
     return ({
@@ -40,22 +41,32 @@ module.exports = {
         }
     },
     register: async (req, res, next) => {
-        let consulta1 = await sql.usuario.search(req.body.DNI);                                         //busco si dni en la tabla
-        if (consulta1 == false)                                                                         //evaluo si existe el registro
+        const errors = validationResult(req);
+        console.log(errors);
+        if (errors.isEmpty())                                                                                                           //verifico si tiene errores en la validacion de datos
         {
-            sql.usuario.new(req.body);                                                                  //regenero el registro en la base de datos
-            let consulta2 = await sql.usuario.search(req.body.DNI);                                     //busco si se agrego correctamente
-            if (consulta2 == false)                                                                     //evaluo si se encontro el registro
+            let consulta1 = await sql.usuario.search(req.body.DNI);                                                                     //busco si dni en la tabla
+            if (consulta1 == false)                                                                                                     //evaluo si existe el registro
             {
-                res.json(respuesta(404, 'error al crear el registro, vuelva a intentar'));              //devuelvo erro al crear registro
+                sql.usuario.new(req.body);                                                                                              //regenero el registro en la base de datos
+                let consulta2 = await sql.usuario.search(req.body.DNI);                                                                 //busco si se agrego correctamente
+                if (consulta2 == false)                                                                                                 //evaluo si se encontro el registro
+                {
+                    res.json(respuesta(404, 'error al crear el registro, vuelva a intentar'));                                          //devuelvo erro al crear registro
+                }
+                else {
+                    res.json(respuesta(201, `Gracias por registrarse ${consulta2.nombre} ${consulta2.apellido}`));                      //devuelvo el registro entero, registro exitoso
+                }
             }
-            else {
-                res.json(respuesta(200, { ...consulta2 }));                                             //devuelvo el registro entero, registro exitoso
+            else 
+            {
+                res.json(respuesta(400, `Ya se encontro otro registro con ese dni como ${consulta1.nombre} ${consulta1.apellido}`));    //error, registro previo encontrado, devuelvo el nombre
             }
         }
         else 
         {
-            res.json(respuesta(404, { nombre: consulta1.nombre }));                                     //error, registro previo encontrado, devuelvo el nombre
+            res.json(respuesta(401, errors.errors));                                                                                    //devuelvo la lista de errores en el formulario
         }
-},
+
+    },
 }

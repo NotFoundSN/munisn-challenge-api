@@ -5,10 +5,11 @@ const router = express.Router();
 const controller = require('../controllers/index.Controller');
 
 //middleware
+const registerMiddleware = require('../middleware/registerMiddleware');
 const tokenMiddleware = require('../middleware/tokenMiddleware');
 
 //rutas
-router.post('/register', controller.register);
+router.post('/register', registerMiddleware, controller.register);
 router.post('/login', controller.login);
 router.post('/view',tokenMiddleware, controller.view);
 

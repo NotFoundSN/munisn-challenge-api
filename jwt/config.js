@@ -7,7 +7,7 @@ module.exports = {
             id: data.id,
             username: data.usuario,
             name: data.nombre
-        }, secret, { expiresIn: '1h' });                //se necesita el secret, y se le agrega un vencimiento
+        }, secret, { expiresIn: '12h' });                //se necesita el secret, y se le agrega un vencimiento
     },
     verifyToken: (token) => {
         let validacion
