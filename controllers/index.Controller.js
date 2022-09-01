@@ -1,6 +1,8 @@
 const token = require('../jwt/config');
 const sql = require('../sql/config');
 const { validationResult } = require("express-validator");
+const sal = 10;
+const bcryptjs = require('bcryptjs');
 
 function respuesta(estado, dato) {
     return ({
@@ -18,7 +20,7 @@ module.exports = {
             res.json(respuesta(404, 'usuario o contraseña invalido'));                      //error de usuario
         }
         else {
-            if (admin.pass == req.body.password)                                            //Valida que la pw coincida
+            if (bcryptjs.compareSync(req.body.password, admin.pass))                        //Valida que la pw coincida
             {
                 let data = token.createToken(admin);
                 res.json(respuesta(200, { token: data, name: admin.nombre }))               //devuelvo el token generado y el nombre del usuario
@@ -30,7 +32,6 @@ module.exports = {
     },
     view: async (req, res, next) => {
         errors = req.errors;                                                //traigo los errores
-        console.log(errors);
         if (errors.length == 0)                                             //reviso si hay errores
         {
             let consulta = await sql.usuario.viewAll();                     //busco todos los registros
@@ -42,7 +43,6 @@ module.exports = {
     },
     register: async (req, res, next) => {
         const errors = validationResult(req);
-        console.log(errors);
         if (errors.isEmpty())                                                                                                           //verifico si tiene errores en la validacion de datos
         {
             let consulta1 = await sql.usuario.search(req.body.DNI);                                                                     //busco si dni en la tabla

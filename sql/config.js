@@ -8,7 +8,7 @@ const db = mysql.createConnection({                     // datos de conexion con
 module.exports = {
     usuario: {
         new: (datos) => {
-            let sql = `INSERT INTO usuarios (DNI, nombre, apellido, telefono, email, direccion) VALUES (${datos.DNI}, '${datos.name}', '${datos.surname}', '${datos.phone}', '${datos.mail}', '${datos.direction}')`;
+            let sql = `INSERT INTO usuarios (DNI, nombre, apellido, telefono, email, direccion) VALUES (${datos.DNI}, '${datos.name}', '${datos.surname}', '${datos.phone}', '${datos.email}', '${datos.direction}')`;
             db.query(sql);                                                                                  //ejecuto el insert
         },
         search: async (dni) => {

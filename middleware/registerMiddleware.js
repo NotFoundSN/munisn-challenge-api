@@ -12,7 +12,7 @@ const registerMiddleware = [
         .isLength({ min: 7 }).withMessage("El DNI debe tener al menos 7 digitos"),
     body("phone")
         .notEmpty().withMessage("Falta ingresar un numero de telefono")                 //
-        .isMobilePhone().withMessage("No es formato valido"),
+        .isMobilePhone().withMessage("No es formato valido de telefono"),
     body("email")
         .notEmpty().withMessage("Falta completar un E-mail")                            //
         .isEmail().withMessage("Formato invalido de E-Mail"),
