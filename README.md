@@ -1,6 +1,8 @@
 # munisn-challenge-api
 parte backend desarrollada en node.js solicitada en un challenge
 
+[Ir al frontend](https://github.com/NotFoundSN/munisn-challenge-ui)
+
 ## consigna
 El challenge consiste en realizar una pantalla con un formulario de registro para usuarios con un rol normal/no administrador. Por otro lado una pantalla de login para un usuario con rol administrador el cuál no es necesario registrar mediante la página, puede estar seteado en la base de datos.
 
