@@ -12,5 +12,8 @@ const tokenMiddleware = require('../middleware/tokenMiddleware');
 router.post('/register', registerMiddleware, controller.register);
 router.post('/login', controller.login);
 router.post('/view',tokenMiddleware, controller.view);
+router.get('/', (req,res)=>{
+    res.status(200).json('Hola mundo');
+});
 
 module.exports = router;
