@@ -31,8 +31,8 @@ CREATE TABLE `usuarios` (
 
 
 LOCK TABLES `administradores` WRITE;
-INSERT INTO municipalidad.administradores (usuario,pass,nombre) VALUES ('admin','$2a$10$JbB.xT5fCEQf1cbMcXrde.XDjXrj9XeG3XvtwfciZOOqMCF4011SS','administrador');
-INSERT INTO municipalidad.administradores (usuario,pass,nombre) VALUES ('julio','$2a$10$JbB.xT5fCEQf1cbMcXrde.XDjXrj9XeG3XvtwfciZOOqMCF4011SS','Julio Maldonado');
+INSERT INTO municipalidad.administradores (id,usuario,pass,nombre) VALUES (1,'admin','$2a$10$JbB.xT5fCEQf1cbMcXrde.XDjXrj9XeG3XvtwfciZOOqMCF4011SS','administrador');
+INSERT INTO municipalidad.administradores (id,usuario,pass,nombre) VALUES (2,'julio','$2a$10$JbB.xT5fCEQf1cbMcXrde.XDjXrj9XeG3XvtwfciZOOqMCF4011SS','Julio Maldonado');
 
 UNLOCK TABLES;
 
